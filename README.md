@@ -1,16 +1,17 @@
-﻿# Proyecto: Visualizador y Heurística CVRP (Farmatodo - Simulación)
+# 📍 Proyecto: Visualizador y Heurística CVRP (Farmatodo - Simulación)
+
+## 🌟 ¡Bienvenido!
 
 Este repositorio contiene una pequeña herramienta educativa para explorar y comparar una heurística CVRP (Capacitated Vehicle Routing Problem) en dos entornos:
 
 - `index.html` + `main.js` + `styles.css`: interfaz web (cliente-side) que permite editar depósitos y clientes, ejecutar una heurística greedy multi-depot y visualizar rutas en canvas.
 - `ejercicio.py`: script Python que implementa la misma heurística greedy que la web (no un solver exacto) para garantizar paridad resultado-web/python y generar `resultado_rutas.txt`.
-
-Resumen importante:
 - Cada almacén (depot) tiene siempre 1 vehículo por defecto (regla de negocio).
 - La instancia por defecto incluye 3 depósitos y 5 clientes (distribución pensada para producir 3 clientes asignados a un almacén y 2 a otro).
 - `ejercicio.py` y `main.js` usan la misma función de distancia (Haversine) y la misma lógica greedy: asignación al depósito más cercano y greedy nearest-customer por depósito con un vehículo.
 
-Contenido del repositorio
+## 📦 Contenido del repositorio
+
 - `ejercicio.py` — implementación Python del heurístico greedy (demanda mínima por cliente = 200 kg, capacidad por vehículo = 22000 kg por defecto). Genera `resultado_rutas.txt`.
 - `index.html`, `main.js`, `styles.css` — interfaz web interactiva con edición de nodos, export/import JSON, y visualización responsiva para móvil.
 - `resultado_rutas.txt` — salida textual generada por `ejercicio.py`.
@@ -18,7 +19,7 @@ Contenido del repositorio
 - En la web: pulsar `Recalcular Rutas`, luego copiar el JSON de la caja `Importar/Exportar JSON` y guardarlo como `data.json` en la carpeta del proyecto.
 - En la terminal: ejecutar `python ejercicio.py` — el script cargará `data.json` si existe y reproducirá la misma asignación/orden que la web.
 
-Heurística (web y Python)
+## 🗺️ Heurística (web y Python)
 
 La heurística ejecutada por la web y por `ejercicio.py` es la misma y sigue estas reglas (implementación en `recomputeGreedyFromData` y en `ejercicio.py`):
 
@@ -91,7 +92,7 @@ Este documento describe la formulación matemática y la lógica del modelo usad
 - `index.html`, `main.js`, `styles.css`: interfaz y heurística cliente-side (visualización y prototipado).
 - `resultado_rutas.txt`: salida sample generada por el script.
 
-**1. Notación y conjuntos**
+**📝 1. Notación y conjuntos**
 - N: conjunto de nodos, con índice 0 reservado para el/de los depósitos (depots) y 1..n para clientes.
 - D ⊆ N: índices de depósitos.
 - C ⊆ N: índices de clientes (N = D ∪ C).
@@ -106,7 +107,7 @@ Variables de decisión:
 - $x_{ij} \in \{0,1\}$, para todo $i,j \in N$, donde $x_{ij}=1$ si el arco (i→j) es recorrido por algún vehículo.
 - $u_i \ge 0$ (continuo), variable auxiliar usada por restricciones tipo MTZ para evitar subtours o para representar carga acumulada.
 
-**2. Distancia: fórmula de Haversine**
+**🌐 2. Distancia: fórmula de Haversine**
 
 Sea $(\phi_i,\lambda_i)$ latitud y longitud del nodo $i$ en radianes. Definimos:
 
@@ -117,7 +118,7 @@ $$d_{ij} = R\,c$$
 
 donde $R\approx 6371\,$ km (radio medio de la Tierra). Esta distancia es usada para construir la matriz $d_{ij}$ que alimenta la función objetivo.
 
-**3. Formulación MIP (CVRP — versión compacta)**
+**💡 3. Formulación MIP (CVRP — versión compacta)**
 
 Función objetivo (minimizar distancia total recorrida):
 
@@ -145,9 +146,7 @@ $$q_i \le u_i \le Q \quad \forall i\in C$$
 
 Explicación: si $x_{ij}=1$ entonces la desigualdad fuerza que $u_j$ sea al menos $u_i + q_j$, propagando la carga; cuando $x_{ij}=0$ la desigualdad no es restrictiva por el término $Q\,x_{ij}$.
 
-Comentario sobre MTZ: la variante MTZ introduce $O(n)$ variables auxiliares y $O(n^2)$ restricciones y evita subtours de forma compacta. Para instancias grandes puede ser ineficiente frente a métodos basados en cortes o heurísticas.
-
-**4. Interpretación y lógica del modelo**
+**📜 4. Interpretación y lógica del modelo**
 
 - $x_{ij}$ modela la estructura topológica de las rutas (qué arcos se usan).
 - $u_i$ permite seguir la secuencia o carga acumulada y evita subtours (rutas que no pasan por el depot).
@@ -158,7 +157,7 @@ Decisiones de diseño comunes y su justificación:
 - Modelado de capacidad con $u_i$: compacto y fácil de implementar con solvers MIP públicos (PuLP/CBC, Gurobi, CPLEX).
 - En presencia de muchos clientes se recomiendan heurísticas (Clarke-Wright, inserción, búsqueda local) o metaheurísticas (Tabú, Simulated Annealing) porque la resolución exacta escala mal.
 
-**5. Heurística implementada en la UI (resumen lógico)**
+**⚙️ 5. Heurística implementada en la UI (resumen lógico)**
 
 La interfaz cliente-side implementa una heurística determinista y rápida con dos fases:
 
@@ -168,13 +167,6 @@ La interfaz cliente-side implementa una heurística determinista y rápida con d
 	- Repetir: seleccionar el cliente sin servir más cercano al último nodo visitado que cumpla $q_j\le Q_{rem}$; añadir a la ruta y actualizar $Q_{rem}\leftarrow Q_{rem}-q_j$.
 	- Terminar cuando no haya cliente servible; volver al depot.
 
-Ventajas: simple, rápida, determinista y fácil de visualizar.
-Limitaciones: no garantiza optimalidad ni equilibrio entre depósitos; sensible al orden inicial de clientes (greedy local).
-
-**6. Mapeo rápido entre fórmulas y código**
-- Matriz de distancias $d_{ij}$: calculada en `main.js` y en `ejercicio.py` con la función Haversine.
-- Variables $x_{ij}$ y $u_i$: construidas en `ejercicio.py` cuando se arma el modelo PuLP.
-- Heurística greedy: función `recomputeGreedyFromData` en `main.js` y rutina equivalente en `ejercicio.py`.
-
 ---
+
 
