@@ -414,4 +414,16 @@
   refreshClientsList();
   refreshDepotsList();
 
+  // Toggle results visibility on mobile
+  const toggleBtn = document.getElementById('toggleResultsBtn');
+  const resultsBox = document.getElementById('resultsBox');
+  if(toggleBtn && resultsBox){
+    toggleBtn.addEventListener('click', ()=>{
+      if(resultsBox.style.display === 'none'){ resultsBox.style.display = 'block'; toggleBtn.textContent = 'Ocultar resultados'; }
+      else { resultsBox.style.display = 'none'; toggleBtn.textContent = 'Mostrar resultados'; }
+    });
+    // start hidden on small screens to reduce clutter
+    if(window.innerWidth <= 640){ resultsBox.style.display = 'none'; toggleBtn.textContent = 'Mostrar resultados'; }
+  }
+
 })();

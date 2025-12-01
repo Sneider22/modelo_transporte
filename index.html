@@ -113,7 +113,11 @@
 
     <section class="bg-white p-4 rounded shadow">
       <h3 class="font-semibold">Rutas generadas</h3>
-      <pre id="resultsBox" class="mt-2 text-sm">Pulsa "Recalcular Rutas" para generar rutas.</pre>
+      <div class="flex items-center justify-between mt-2">
+        <div class="text-sm text-gray-600 hidden lg:block">Resultados de la optimización</div>
+        <button id="toggleResultsBtn" class="lg:hidden bg-gray-100 text-gray-800 small-btn">Mostrar / Ocultar resultados</button>
+      </div>
+      <pre id="resultsBox" class="mt-2 text-sm results-box">Pulsa "Recalcular Rutas" para generar rutas.</pre>
     </section>
   </div>
 

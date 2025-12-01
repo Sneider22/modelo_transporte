@@ -12,3 +12,9 @@ body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvet
 
 /* Mejor contraste para etiquetas en canvas si se usa en móvil */
 .canvas-label{ font-weight:600; }
+
+/* Results box styling for mobile */
+.results-box{ background: #ffffff; border: 1px solid #e5e7eb; padding: 12px; border-radius: 6px; overflow:auto; max-height: 40vh; }
+@media (max-width:640px){
+	.results-box{ font-size:16px; max-height:36vh; }
+}
