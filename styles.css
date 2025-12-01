@@ -1,0 +1,14 @@
+/* Archivo de estilos extra (opcional). Tailwind está cargado en index.html, este archivo queda para reglas personalizadas. */
+body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
+
+/* Ajustes responsivos para móvil */
+#map-canvas { width: 100%; height: 480px; border-radius: .5rem; }
+@media (max-width: 640px){
+	#map-canvas { height: 60vh; }
+	.small-btn{ padding:.6rem .8rem; font-size: 15px; }
+	input[type=number], input[type=text], textarea{ font-size: 15px; }
+	#clientsList, #depotsList{ max-height: 28vh; }
+}
+
+/* Mejor contraste para etiquetas en canvas si se usa en móvil */
+.canvas-label{ font-weight:600; }
