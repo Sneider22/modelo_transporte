@@ -1,21 +1,25 @@
 // main.js - Interfaz CVRP (cliente-side) - heurística greedy y edición de nodos
 (function(){
-  // Datos por defecto (simulación)
+  // Datos por defecto cargados desde JSON del usuario (instancia proporcionada recientemente)
   window.OPTIMIZATION_RESULTS = {
-    totalDistance: 0,
-    status: 'NotRun',
-    // nodes: objeto id -> { name, demand, E, L, lat, lon, depot?: true, vehicles?: n }
+    totalDistance: 2.754661170184616,
+    status: 'Heuristic',
     nodes: {
-      // tres almacenes mínimos
-      1: { name: 'Almacén Norte', demand:0, E:0, L:1440, lat:40.4500, lon:-3.7000, depot:true, vehicles:2 },
-      2: { name: 'Almacén Sur',  demand:0, E:0, L:1440, lat:40.4300, lon:-3.7100, depot:true, vehicles:2 },
-      3: { name: 'Almacén Este', demand:0, E:0, L:1440, lat:40.4400, lon:-3.6800, depot:true, vehicles:1 },
-      // tres clientes mínimos
-      10: { name: 'Tienda A', demand:200, E:0, L:480, lat:40.4168, lon:-3.7038 },
-      11: { name: 'Tienda B', demand:300, E:0, L:480, lat:40.4233, lon:-3.7000 },
-      12: { name: 'Tienda C', demand:250, E:0, L:480, lat:40.4285, lon:-3.6950 }
+      "1": { "name": "Almacén Norte", "demand": 0, "E": 0, "L": 1440, "lat": 40.44528933211498, "lon": -3.6955678224704815, "depot": true, "vehicles": 1 },
+      "2": { "name": "Almacén Sur", "demand": 0, "E": 0, "L": 1440, "lat": 40.44118520927391, "lon": -3.6940182715253753, "depot": true, "vehicles": 1 },
+      "3": { "name": "Almacén Este", "demand": 0, "E": 0, "L": 1440, "lat": 40.443506084379536, "lon": -3.693013713679337, "depot": true, "vehicles": 1 },
+      "10": { "name": "Cliente 10", "demand": 200, "E": 0, "L": 480, "lat": 40.44859519461797, "lon": -3.6926292780233725 },
+      "11": { "name": "Cliente 11", "demand": 220, "E": 0, "L": 480, "lat": 40.44932983072975, "lon": -3.697363599788293 },
+      "12": { "name": "Cliente 12", "demand": 250, "E": 0, "L": 480, "lat": 40.447370801098344, "lon": -3.6948739997874047 },
+      "13": { "name": "Cliente 13", "demand": 200, "E": 0, "L": 480, "lat": 40.440141139987915, "lon": -3.6976901048825503 },
+      "14": { "name": "Cliente 14", "demand": 210, "E": 0, "L": 480, "lat": 40.44215512692083, "lon": -3.696616266836483 },
+      "15": { "name": "Cliente", "demand": 200, "E": 0, "L": 480, "lat": 40.44566918127527, "lon": -3.691091197295794 }
     },
-    routes: {}
+    routes: {
+      "1": { "sequence": [1,12,10,11,1], "demand": 670, "distance": 1.355614079477195, "depot": 1, "vehicleIdx": 0, "capacity": 22000 },
+      "2": { "sequence": [2,14,13,2], "demand": 410, "distance": 0.8182880438967184, "depot": 2, "vehicleIdx": 0, "capacity": 22000 },
+      "3": { "sequence": [3,15,3], "demand": 200, "distance": 0.5807590468107028, "depot": 3, "vehicleIdx": 0, "capacity": 22000 }
+    }
   };
 
   // Copia original para reset
@@ -110,7 +114,8 @@
     const name = document.getElementById('newDepotName').value || 'Almacén';
     const lat = parseFloat(document.getElementById('newDepotLat').value) || 40.43;
     const lon = parseFloat(document.getElementById('newDepotLon').value) || -3.7;
-    const vehicles = parseInt(document.getElementById('newDepotVehicles').value,10) || 1;
+    // Forzamos 1 vehículo por almacén (regla de negocio)
+    const vehicles = 1;
     const nodes = OPTIMIZATION_RESULTS.nodes;
     const ids = Object.keys(nodes).map(k=>Number(k));
     const newId = ids.length? Math.max(...ids)+1 : 1;
@@ -125,8 +130,8 @@
     const nodes = OPTIMIZATION_RESULTS.nodes;
     Object.keys(nodes).forEach(k=>{ if(nodes[k].depot) delete nodes[k]; });
     // agregar defaults
-    nodes[1] = { name: 'Almacén Norte', demand:0, E:0, L:1440, lat:40.4500, lon:-3.7000, depot:true, vehicles:2 };
-    nodes[2] = { name: 'Almacén Sur',  demand:0, E:0, L:1440, lat:40.4300, lon:-3.7100, depot:true, vehicles:2 };
+    nodes[1] = { name: 'Almacén Norte', demand:0, E:0, L:1440, lat:40.4500, lon:-3.7000, depot:true, vehicles:1 };
+    nodes[2] = { name: 'Almacén Sur',  demand:0, E:0, L:1440, lat:40.4300, lon:-3.7100, depot:true, vehicles:1 };
     nodes[3] = { name: 'Almacén Este', demand:0, E:0, L:1440, lat:40.4400, lon:-3.6800, depot:true, vehicles:1 };
     document.getElementById('dataJson').value = JSON.stringify(OPTIMIZATION_RESULTS,null,2);
     drawRoutesOnCanvas(OPTIMIZATION_RESULTS); refreshDepotsList();
@@ -361,7 +366,20 @@
     document.getElementById('dataJson').value = JSON.stringify(OPTIMIZATION_RESULTS,null,2);
     drawRoutesOnCanvas(OPTIMIZATION_RESULTS); refreshClientsList();
   });
-  document.getElementById('clearClientsBtn').addEventListener('click', ()=>{ if(!confirm('Borrar todos los clientes?')) return; const nodes=OPTIMIZATION_RESULTS.nodes; Object.keys(nodes).forEach(k=>{ if(!nodes[k].depot) delete nodes[k]; }); document.getElementById('dataJson').value=JSON.stringify(OPTIMIZATION_RESULTS,null,2); drawRoutesOnCanvas(OPTIMIZATION_RESULTS); refreshClientsList(); });
+  document.getElementById('clearClientsBtn').addEventListener('click', ()=>{
+    if(!confirm('Restablecer clientes a los 5 clientes por defecto?')) return;
+    const nodes = OPTIMIZATION_RESULTS.nodes;
+    // eliminar todos los clientes actuales
+    Object.keys(nodes).forEach(k=>{ if(!nodes[k].depot) delete nodes[k]; });
+    // restaurar 5 clientes por defecto (3 cercanos al Almacén Norte, 2 al Almacén Sur)
+    nodes[10] = { name: 'Cliente 10', demand:200, E:0, L:480, lat:40.4490, lon:-3.6990 };
+    nodes[11] = { name: 'Cliente 11', demand:220, E:0, L:480, lat:40.4480, lon:-3.7010 };
+    nodes[12] = { name: 'Cliente 12', demand:250, E:0, L:480, lat:40.4470, lon:-3.7020 };
+    nodes[13] = { name: 'Cliente 13', demand:200, E:0, L:480, lat:40.4310, lon:-3.7090 };
+    nodes[14] = { name: 'Cliente 14', demand:210, E:0, L:480, lat:40.4290, lon:-3.7110 };
+    document.getElementById('dataJson').value = JSON.stringify(OPTIMIZATION_RESULTS,null,2);
+    drawRoutesOnCanvas(OPTIMIZATION_RESULTS); refreshClientsList();
+  });
 
   function refreshClientsList(){ const container=document.getElementById('clientsList'); container.innerHTML=''; const nodes=OPTIMIZATION_RESULTS.nodes; Object.entries(nodes).forEach(([id,node])=>{ if(node.depot) return; const div=document.createElement('div'); div.className='p-2 border rounded flex items-center justify-between'; div.innerHTML=`<div><strong>N${id}</strong> ${node.name} · Dem:${node.demand}</div>`; const actions=document.createElement('div'); const del=document.createElement('button'); del.className='px-2 py-1 text-xs bg-red-100 text-red-700 rounded'; del.textContent='Eliminar'; del.onclick=()=>{ if(confirm('Eliminar '+id+'?')){ delete OPTIMIZATION_RESULTS.nodes[id]; document.getElementById('dataJson').value=JSON.stringify(OPTIMIZATION_RESULTS,null,2); drawRoutesOnCanvas(OPTIMIZATION_RESULTS); refreshClientsList(); } }; const edit=document.createElement('button'); edit.className='px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded ml-2'; edit.textContent='Editar'; edit.onclick=()=>{ document.getElementById('newName').value=node.name; document.getElementById('newDemand').value=node.demand; document.getElementById('newE').value=node.E; document.getElementById('newL').value=node.L; document.getElementById('newLat').value=node.lat; document.getElementById('newLon').value=node.lon; delete OPTIMIZATION_RESULTS.nodes[id]; document.getElementById('dataJson').value=JSON.stringify(OPTIMIZATION_RESULTS,null,2); drawRoutesOnCanvas(OPTIMIZATION_RESULTS); refreshClientsList(); }; actions.appendChild(edit); actions.appendChild(del); div.appendChild(actions); container.appendChild(div); }); }
 

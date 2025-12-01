@@ -1,0 +1,10 @@
+Status: Heuristic | Dist(total): 2.755 km
+
+Almacén 1 - Almacén Norte | Salida: 670kg / Cap: 22000kg
+  Vehículo 1: D1 -> N12(d=250) -> N10(d=200) -> N11(d=220) -> D1 | Carga: 670 / Cap:22000 | Dist: 1.356 km
+
+Almacén 2 - Almacén Sur | Salida: 410kg / Cap: 22000kg
+  Vehículo 1: D2 -> N14(d=210) -> N13(d=200) -> D2 | Carga: 410 / Cap:22000 | Dist: 0.818 km
+
+Almacén 3 - Almacén Este | Salida: 200kg / Cap: 22000kg
+  Vehículo 1: D3 -> N15(d=200) -> D3 | Carga: 200 / Cap:22000 | Dist: 0.581 km
