@@ -1,6 +1,6 @@
 # 📍 Proyecto: Visualizador y Heurística CVRP (Farmatodo - Simulación)
 
-## 🌟 ¡Bienvenido!
+## ¡Bienvenido!
 
 Este repositorio contiene una pequeña herramienta educativa para explorar y comparar una heurística CVRP (Capacitated Vehicle Routing Problem) en dos entornos:
 
@@ -10,7 +10,7 @@ Este repositorio contiene una pequeña herramienta educativa para explorar y com
 - La instancia por defecto incluye 3 depósitos y 5 clientes (distribución pensada para producir 3 clientes asignados a un almacén y 2 a otro).
 - `ejercicio.py` y `main.js` usan la misma función de distancia (Haversine) y la misma lógica greedy: asignación al depósito más cercano y greedy nearest-customer por depósito con un vehículo.
 
-## 📦 Contenido del repositorio
+## Contenido del repositorio
 
 - `ejercicio.py` — implementación Python del heurístico greedy (demanda mínima por cliente = 200 kg, capacidad por vehículo = 22000 kg por defecto). Genera `resultado_rutas.txt`.
 - `index.html`, `main.js`, `styles.css` — interfaz web interactiva con edición de nodos, export/import JSON, y visualización responsiva para móvil.
@@ -19,7 +19,7 @@ Este repositorio contiene una pequeña herramienta educativa para explorar y com
 - En la web: pulsar `Recalcular Rutas`, luego copiar el JSON de la caja `Importar/Exportar JSON` y guardarlo como `data.json` en la carpeta del proyecto.
 - En la terminal: ejecutar `python ejercicio.py` — el script cargará `data.json` si existe y reproducirá la misma asignación/orden que la web.
 
-## 🗺️ Heurística (web y Python)
+## Heurística (web y Python)
 
 La heurística ejecutada por la web y por `ejercicio.py` es la misma y sigue estas reglas (implementación en `recomputeGreedyFromData` y en `ejercicio.py`):
 
@@ -92,7 +92,7 @@ Este documento describe la formulación matemática y la lógica del modelo usad
 - `index.html`, `main.js`, `styles.css`: interfaz y heurística cliente-side (visualización y prototipado).
 - `resultado_rutas.txt`: salida sample generada por el script.
 
-**📝 1. Notación y conjuntos**
+**1. Notación y conjuntos**
 - N: conjunto de nodos, con índice 0 reservado para el/de los depósitos (depots) y 1..n para clientes.
 - D ⊆ N: índices de depósitos.
 - C ⊆ N: índices de clientes (N = D ∪ C).
@@ -107,7 +107,7 @@ Variables de decisión:
 - $x_{ij} \in \{0,1\}$, para todo $i,j \in N$, donde $x_{ij}=1$ si el arco (i→j) es recorrido por algún vehículo.
 - $u_i \ge 0$ (continuo), variable auxiliar usada por restricciones tipo MTZ para evitar subtours o para representar carga acumulada.
 
-**🌐 2. Distancia: fórmula de Haversine**
+**2. Distancia: fórmula de Haversine**
 
 Sea $(\phi_i,\lambda_i)$ latitud y longitud del nodo $i$ en radianes. Definimos:
 
@@ -118,7 +118,7 @@ $$d_{ij} = R\,c$$
 
 donde $R\approx 6371\,$ km (radio medio de la Tierra). Esta distancia es usada para construir la matriz $d_{ij}$ que alimenta la función objetivo.
 
-**💡 3. Formulación MIP (CVRP — versión compacta)**
+**3. Formulación MIP (CVRP — versión compacta)**
 
 Función objetivo (minimizar distancia total recorrida):
 
@@ -146,7 +146,7 @@ $$q_i \le u_i \le Q \quad \forall i\in C$$
 
 Explicación: si $x_{ij}=1$ entonces la desigualdad fuerza que $u_j$ sea al menos $u_i + q_j$, propagando la carga; cuando $x_{ij}=0$ la desigualdad no es restrictiva por el término $Q\,x_{ij}$.
 
-**📜 4. Interpretación y lógica del modelo**
+**4. Interpretación y lógica del modelo**
 
 - $x_{ij}$ modela la estructura topológica de las rutas (qué arcos se usan).
 - $u_i$ permite seguir la secuencia o carga acumulada y evita subtours (rutas que no pasan por el depot).
@@ -157,7 +157,7 @@ Decisiones de diseño comunes y su justificación:
 - Modelado de capacidad con $u_i$: compacto y fácil de implementar con solvers MIP públicos (PuLP/CBC, Gurobi, CPLEX).
 - En presencia de muchos clientes se recomiendan heurísticas (Clarke-Wright, inserción, búsqueda local) o metaheurísticas (Tabú, Simulated Annealing) porque la resolución exacta escala mal.
 
-**⚙️ 5. Heurística implementada en la UI (resumen lógico)**
+**5. Heurística implementada en la UI (resumen lógico)**
 
 La interfaz cliente-side implementa una heurística determinista y rápida con dos fases:
 
