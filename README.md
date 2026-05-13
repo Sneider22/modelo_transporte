@@ -169,4 +169,9 @@ La interfaz cliente-side implementa una heurística determinista y rápida con d
 
 ---
 
+## 👤 Autor
+
+Sneider Araque - 9no semestre (Optimización de Sistemas y Funciones)
+
+---
 
